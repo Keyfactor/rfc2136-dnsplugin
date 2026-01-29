@@ -1,0 +1,19 @@
+{
+  "pluginType": "DomainValidator",
+  "validationType": "DNS",
+  "providerName": "rfc2136",
+  "displayName": "RFC2136 Dynamic DNS",
+  "description": "DNS-01 challenge validation using RFC2136 Dynamic Updates (BIND/Microsoft DNS)",
+  "assemblyName": "Rfc2136DomainValidator.dll",
+  "typeName": "Keyfactor.Extensions.DomainValidator.Rfc2136.Rfc2136DomainValidator",
+  "version": "1.0.0",
+  "author": "Keyfactor",
+  "configurationFields": [
+    "Rfc2136_Server",
+    "Rfc2136_Port",
+    "Rfc2136_Zone",
+    "Rfc2136_TsigKeyName",
+    "Rfc2136_TsigKey",
+    "Rfc2136_TsigAlgorithm"
+  ]
+}
