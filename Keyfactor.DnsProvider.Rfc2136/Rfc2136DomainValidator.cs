@@ -66,7 +66,7 @@ namespace Keyfactor.Extensions.DomainValidator.Rfc2136
 
         public string GetValidationType()
         {
-            return "DNS";
+            return "dns-01";
         }
 
         public void Initialize(IDomainValidatorConfigProvider configProvider)
