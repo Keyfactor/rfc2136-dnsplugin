@@ -50,7 +50,7 @@ The RFC2136 Dynamic DNS Provider plugin enables automated DNS-based domain valid
 ## Requirements
 
 ### Keyfactor Platform
-- Keyfactor AnyCA Gateway REST **26.0 or later** (DNS validation support was added in AnyCA Gateway 26)
+- Keyfactor AnyCA Gateway REST **26.2 or later** (DNS validation support was added in AnyCA Gateway 26.2)
 - A gateway product that supports DNS-01 domain validation (ACME REST Gateway, DigiCert, Sectigo, etc.)
 
 ### RFC2136 Dynamic DNS Requirements
