@@ -1,0 +1,85 @@
+{
+  "$schema": "https://keyfactor.github.io/v2/integration-manifest-schema.json",
+  "integration_type": "dns-plugin",
+  "name": "RFC2136 Dynamic DNS Plugin",
+  "status": "pilot",
+  "support_level": "kf-community",
+  "update_catalog": false,
+  "link_github": false,
+  "description": "DNS-01 challenge validation provider using RFC 2136 Dynamic DNS Updates. Compatible with any DNS server that supports RFC 2136 (BIND, Microsoft DNS, PowerDNS, Knot DNS, etc.). Authenticates DNS updates via TSIG (RFC 2845) shared keys.",
+  "release_dir": "Keyfactor.DnsProvider.Rfc2136/bin/Release",
+  "release_project": "Keyfactor.DnsProvider.Rfc2136/Keyfactor.DnsProvider.Rfc2136.csproj",
+  "about": {
+    "dns_provider": {
+      "providerName": "rfc2136",
+      "displayName": "RFC2136 Dynamic DNS",
+      "assemblyName": "Rfc2136DomainValidator",
+      "fullyQualifiedClassName": "Keyfactor.Extensions.DomainValidator.Rfc2136.Rfc2136DomainValidator",
+      "validationType": "dns-01",
+      "providerEndpoint": "the configured DNS server",
+      "providerDocsUrl": "https://datatracker.ietf.org/doc/html/rfc2136",
+      "dns_provider_config": [
+        {
+          "Name": "Rfc2136_Server",
+          "DisplayName": "DNS Server",
+          "DataType": 1,
+          "InstanceLevel": false,
+          "Hidden": false,
+          "DefaultValue": "ns1.example.com",
+          "Required": true,
+          "Description": "DNS server hostname or IP address that accepts RFC 2136 dynamic updates."
+        },
+        {
+          "Name": "Rfc2136_Port",
+          "DisplayName": "DNS Server Port",
+          "DataType": 1,
+          "InstanceLevel": false,
+          "Hidden": false,
+          "DefaultValue": "53",
+          "Required": false,
+          "Description": "DNS server port. Defaults to 53."
+        },
+        {
+          "Name": "Rfc2136_Zone",
+          "DisplayName": "DNS Zone",
+          "DataType": 1,
+          "InstanceLevel": false,
+          "Hidden": false,
+          "DefaultValue": "example.com",
+          "Required": true,
+          "Description": "DNS zone (origin) into which TXT records will be written."
+        },
+        {
+          "Name": "Rfc2136_TsigKeyName",
+          "DisplayName": "TSIG Key Name",
+          "DataType": 1,
+          "InstanceLevel": false,
+          "Hidden": false,
+          "DefaultValue": "keyfactor-acme",
+          "Required": true,
+          "Description": "Name of the TSIG key configured on the DNS server (as it appears in named.conf or equivalent)."
+        },
+        {
+          "Name": "Rfc2136_TsigKey",
+          "DisplayName": "TSIG Key (Base64)",
+          "DataType": 2,
+          "InstanceLevel": false,
+          "Hidden": true,
+          "DefaultValue": "",
+          "Required": true,
+          "Description": "Base64-encoded TSIG key value. Pair with the key name configured on the DNS server."
+        },
+        {
+          "Name": "Rfc2136_TsigAlgorithm",
+          "DisplayName": "TSIG Algorithm",
+          "DataType": 1,
+          "InstanceLevel": false,
+          "Hidden": false,
+          "DefaultValue": "hmac-sha256",
+          "Required": false,
+          "Description": "TSIG algorithm. Common values: hmac-sha256 (default), hmac-sha512, hmac-sha1, hmac-md5."
+        }
+      ]
+    }
+  }
+}
