@@ -1,8 +1,38 @@
-# Keyfactor RFC2136 Dynamic DNS Provider
+<h1 align="center" style="border-bottom: none">
+    RFC2136 Dynamic DNS Provider
+</h1>
 
-[![Build](https://github.com/Keyfactor/rfc2136-dnsplugin/actions/workflows/keyfactor-starter-workflow.yml/badge.svg)](https://github.com/Keyfactor/rfc2136-dnsplugin/actions/workflows/keyfactor-starter-workflow.yml)
-[![Release](https://img.shields.io/github/v/release/Keyfactor/rfc2136-dnsplugin?style=flat-square)](https://github.com/Keyfactor/rfc2136-dnsplugin/releases)
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+<p align="center">
+  <!-- Badges -->
+<img src="https://img.shields.io/badge/integration_status-pilot-3D1973?style=flat-square" alt="Integration Status: pilot" />
+<a href="https://github.com/Keyfactor/rfc2136-dnsplugin/actions/workflows/keyfactor-starter-workflow.yml"><img src="https://github.com/Keyfactor/rfc2136-dnsplugin/actions/workflows/keyfactor-starter-workflow.yml/badge.svg" alt="Build" /></a>
+<a href="https://github.com/Keyfactor/rfc2136-dnsplugin/releases"><img src="https://img.shields.io/github/v/release/Keyfactor/rfc2136-dnsplugin?style=flat-square" alt="Release" /></a>
+<img src="https://img.shields.io/github/issues/Keyfactor/rfc2136-dnsplugin?style=flat-square" alt="Issues" />
+<img src="https://img.shields.io/github/downloads/Keyfactor/rfc2136-dnsplugin/total?style=flat-square&label=downloads&color=28B905" alt="GitHub Downloads (all assets, all releases)" />
+</p>
+
+<p align="center">
+  <!-- TOC -->
+  <a href="#support">
+    <b>Support</b>
+  </a>
+  ·
+  <a href="#requirements">
+    <b>Requirements</b>
+  </a>
+  ·
+  <a href="#installation">
+    <b>Installation</b>
+  </a>
+  ·
+  <a href="#license">
+    <b>License</b>
+  </a>
+  ·
+  <a href="https://github.com/orgs/Keyfactor/repositories?q=dnsplugin">
+    <b>Related Integrations</b>
+  </a>
+</p>
 
 ## Overview
 
@@ -11,11 +41,7 @@ The RFC2136 Dynamic DNS Provider plugin enables automated DNS-based domain valid
 ## Features
 
 - Automated DNS TXT record creation and deletion in RFC2136 Dynamic DNS
-- Support for wildcard domain validation (`*.example.com`)
-- Automatic zone discovery
-- Configurable DNS propagation timeouts
-- Comprehensive error handling and logging
-- Thread-safe concurrent operations
+- Configurable DNS propagation timeouts and retry behavior
 - TSIG-authenticated dynamic updates (HMAC-SHA256 by default; SHA-512/SHA-1/MD5 also supported)
 - Works with any RFC 2136 compliant DNS server (BIND, Microsoft DNS, PowerDNS, Knot DNS, etc.)
 - Operates on-prem or in air-gapped environments — no cloud dependency
@@ -24,7 +50,8 @@ The RFC2136 Dynamic DNS Provider plugin enables automated DNS-based domain valid
 ## Requirements
 
 ### Keyfactor Platform
-- A Keyfactor gateway server hosting an AnyGatewayREST deployment that supports DNS validation (e.g. ACME REST Gateway, DigiCert, Sectigo)
+- Keyfactor AnyCA Gateway REST **26.0 or later** (DNS validation support was added in AnyCA Gateway 26)
+- A gateway product that supports DNS-01 domain validation (ACME REST Gateway, DigiCert, Sectigo, etc.)
 
 ### RFC2136 Dynamic DNS Requirements
 
@@ -40,6 +67,8 @@ The RFC2136 Dynamic DNS Provider plugin enables automated DNS-based domain valid
 ## Installation
 
 This plugin is installed alongside any Keyfactor gateway server that supports DNS-01 domain validation (ACME REST Gateway, DigiCert, Sectigo, etc.). The same DLL works with every supported gateway.
+
+> See the official Keyfactor AnyCA Gateway REST installation documentation for the authoritative install instructions: **<TBD link from Sarah Duncan>**. The steps below are a general guide; defer to the official docs if they diverge.
 
 ### 1. Download the Plugin
 
@@ -68,6 +97,8 @@ Replace `<GatewayName>` (or `<gateway-name>` on Linux) with the gateway you are 
 Restart the AnyGatewayREST Windows service for the gateway you installed the plugin into so the Extensions folder is rescanned.
 
 ## Configuration
+
+After installing the plugin DLL into the gateway's Extensions folder, configure a new DNS Provider entry in the AnyCA Gateway REST UI and select **RFC2136 Dynamic** as the provider type. See the official Keyfactor AnyCA Gateway REST documentation for the canonical UI walkthrough: **<TBD link from Sarah Duncan>**.
 
 ### RFC2136 Dynamic DNS Setup
 
