@@ -4,7 +4,7 @@
   "name": "RFC2136 Dynamic DNS Plugin",
   "status": "pilot",
   "support_level": "kf-community",
-  "update_catalog": false,
+  "update_catalog": true,
   "link_github": false,
   "description": "DNS-01 challenge validation provider using RFC 2136 Dynamic DNS Updates. Compatible with any DNS server that supports RFC 2136 (BIND, Microsoft DNS, PowerDNS, Knot DNS, etc.). Authenticates DNS updates via TSIG (RFC 2845) shared keys.",
   "release_dir": "Keyfactor.DnsProvider.Rfc2136/bin/Release",
