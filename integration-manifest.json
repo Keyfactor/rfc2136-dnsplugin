@@ -1,7 +1,7 @@
 {
   "$schema": "https://keyfactor.github.io/v2/integration-manifest-schema.json",
   "integration_type": "dns-plugin",
-  "name": "RFC2136 Dynamic DNS Plugin",
+  "name": "rfc2136-dnsplugin",
   "status": "pilot",
   "support_level": "kf-community",
   "update_catalog": true,
