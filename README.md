@@ -4,11 +4,11 @@
 
 <p align="center">
   <!-- Badges -->
-<img src="https://img.shields.io/badge/integration_status-pilot-3D1973?style=flat-square" alt="Integration Status: pilot" />
-<a href="https://github.com/Keyfactor/RFC2136 Dynamic DNS Plugin/actions/workflows/keyfactor-starter-workflow.yml"><img src="https://github.com/Keyfactor/RFC2136 Dynamic DNS Plugin/actions/workflows/keyfactor-starter-workflow.yml/badge.svg" alt="Build" /></a>
-<a href="https://github.com/Keyfactor/RFC2136 Dynamic DNS Plugin/releases"><img src="https://img.shields.io/github/v/release/Keyfactor/RFC2136 Dynamic DNS Plugin?style=flat-square" alt="Release" /></a>
-<img src="https://img.shields.io/github/issues/Keyfactor/RFC2136 Dynamic DNS Plugin?style=flat-square" alt="Issues" />
-<img src="https://img.shields.io/github/downloads/Keyfactor/RFC2136 Dynamic DNS Plugin/total?style=flat-square&label=downloads&color=28B905" alt="GitHub Downloads (all assets, all releases)" />
+<img src="https://img.shields.io/badge/integration_status-production-3D1973?style=flat-square" alt="Integration Status: production" />
+<a href="https://github.com/Keyfactor/rfc2136-dnsplugin/actions/workflows/keyfactor-starter-workflow.yml"><img src="https://github.com/Keyfactor/rfc2136-dnsplugin/actions/workflows/keyfactor-starter-workflow.yml/badge.svg" alt="Build" /></a>
+<a href="https://github.com/Keyfactor/rfc2136-dnsplugin/releases"><img src="https://img.shields.io/github/v/release/Keyfactor/rfc2136-dnsplugin?style=flat-square" alt="Release" /></a>
+<img src="https://img.shields.io/github/issues/Keyfactor/rfc2136-dnsplugin?style=flat-square" alt="Issues" />
+<img src="https://img.shields.io/github/downloads/Keyfactor/rfc2136-dnsplugin/total?style=flat-square&label=downloads&color=28B905" alt="GitHub Downloads (all assets, all releases)" />
 </p>
 
 <p align="center">
@@ -72,7 +72,7 @@ This plugin is installed alongside any Keyfactor gateway server that supports DN
 
 ### 1. Download the Plugin
 
-Download the latest release from the [Releases](https://github.com/Keyfactor/RFC2136 Dynamic DNS Plugin/releases) page.
+Download the latest release from the [Releases](https://github.com/Keyfactor/rfc2136-dnsplugin/releases) page.
 
 ### 2. Copy the plugin DLLs to the gateway's Extensions folder
 
@@ -252,13 +252,13 @@ Enable debug logging in the gateway's logging configuration:
 
 ## Support
 
-The RFC2136 Dynamic DNS Provider plugin is open source and there is **no SLA**. Keyfactor will address issues as resources become available. Keyfactor customers may request escalation by opening a support ticket through their Keyfactor representative.
+The RFC2136 Dynamic DNS Provider plugin is supported by Keyfactor for Keyfactor customers. If you have a support issue, please open a support ticket via the Keyfactor Support Portal at https://support.keyfactor.com.
 
 ### Resources
 
 - [RFC2136 Dynamic DNS Documentation](https://datatracker.ietf.org/doc/html/rfc2136)
-- [Report Issues](https://github.com/Keyfactor/RFC2136 Dynamic DNS Plugin/issues)
-- [Discussions](https://github.com/Keyfactor/RFC2136 Dynamic DNS Plugin/discussions)
+- [Report Issues](https://github.com/Keyfactor/rfc2136-dnsplugin/issues)
+- [Discussions](https://github.com/Keyfactor/rfc2136-dnsplugin/discussions)
 
 > To report a problem or suggest a new feature, use the **[Issues](../../issues)** tab. If you want to contribute actual bug fixes or proposed enhancements, use the **[Pull requests](../../pulls)** tab.
 
