@@ -41,7 +41,6 @@ The RFC2136 Dynamic DNS Provider plugin enables automated DNS-based domain valid
 ## Features
 
 - Automated DNS TXT record creation and deletion in RFC2136 Dynamic DNS
-- Configurable DNS propagation timeouts and retry behavior
 - TSIG-authenticated dynamic updates (HMAC-SHA256 by default; SHA-512/SHA-1/MD5 also supported)
 - Works with any RFC 2136 compliant DNS server (BIND, Microsoft DNS, PowerDNS, Knot DNS, etc.)
 - Operates on-prem or in air-gapped environments — no cloud dependency
@@ -145,9 +144,6 @@ On Windows DNS Server, set the zone to allow secure dynamic updates and configur
 | `Rfc2136_TsigKeyName` | Name of the TSIG key configured on the DNS server (as it appears in named.conf or equivalent). | Yes | `keyfactor-acme` |
 | `Rfc2136_TsigKey` | Base64-encoded TSIG key value. Pair with the key name configured on the DNS server. | Yes | ` ` |
 | `Rfc2136_TsigAlgorithm` | TSIG algorithm. Common values: hmac-sha256 (default), hmac-sha512, hmac-sha1, hmac-md5. | No | `hmac-sha256` |
-| `PropagationWaitSeconds` | Seconds to wait for DNS propagation between record creation and verification | No | `60` |
-| `MaxWaitSeconds` | Maximum total seconds to wait for DNS propagation before failing | No | `300` |
-| `RetryAttempts` | Number of retry attempts for transient API errors | No | `3` |
 
 ### Example Configuration
 
@@ -174,7 +170,7 @@ On Windows DNS Server, set the zone to allow secure dynamic updates and configur
 Once configured, the plugin automatically handles DNS validation during certificate enrollment and renewal:
 
 1. **Record Creation**: Plugin creates a DNS TXT record with the validation challenge
-2. **Propagation Wait**: Plugin waits for DNS propagation (configurable timeout)
+2. **Propagation Wait**: Plugin waits for DNS propagation
 3. **Verification**: Plugin verifies the record exists on RFC2136 Dynamic DNS nameservers
 4. **Cleanup**: Plugin deletes the validation record after successful validation
 
