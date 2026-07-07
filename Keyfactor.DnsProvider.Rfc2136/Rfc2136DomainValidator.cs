@@ -89,7 +89,7 @@ namespace Keyfactor.Extensions.DomainValidator.Rfc2136
             if (string.IsNullOrWhiteSpace(tsigKey))
                 throw new ArgumentException("Rfc2136_TsigKey is required");
 
-            _provider = new Rfc2136DnsProvider(server, zone, tsigKeyName, tsigKey, tsigAlgorithm, port, _logger);
+            _provider = new Rfc2136DnsProvider(server, zone, tsigKeyName, tsigKey, tsigAlgorithm, port);
         }
 
         public async Task<DomainValidationResult> StageValidation(string key, string value, CancellationToken cancellationToken)
@@ -106,11 +106,11 @@ namespace Keyfactor.Extensions.DomainValidator.Rfc2136
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "[RFC2136] StageValidation exception");
+                _logger.LogError(ex, "[RFC2136] StageValidation failed for TXT record '{Key}'", key);
                 return new DomainValidationResult
                 {
                     Success = false,
-                    ErrorMessage = $"Failed to create TXT record: {ex.Message}"
+                    ErrorMessage = $"Failed to create TXT record for {key}: {ex.Message}"
                 };
             }
         }
@@ -129,11 +129,11 @@ namespace Keyfactor.Extensions.DomainValidator.Rfc2136
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "[RFC2136] CleanupValidation exception");
+                _logger.LogError(ex, "[RFC2136] CleanupValidation failed for TXT record '{Key}'", key);
                 return new DomainValidationResult
                 {
                     Success = false,
-                    ErrorMessage = $"Failed to delete TXT record: {ex.Message}"
+                    ErrorMessage = $"Failed to delete TXT record for {key}: {ex.Message}"
                 };
             }
         }
