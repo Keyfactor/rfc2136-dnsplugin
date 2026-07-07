@@ -4,6 +4,7 @@ using System.Net;
 using ARSoft.Tools.Net;
 using ARSoft.Tools.Net.Dns;
 using ARSoft.Tools.Net.Dns.DynamicUpdate;
+using Keyfactor.Logging;
 using Microsoft.Extensions.Logging;
 using ArDnsClient = ARSoft.Tools.Net.Dns.DnsClient;
 
@@ -15,13 +16,14 @@ namespace Keyfactor.Extensions.DomainValidator.Rfc2136
     /// </summary>
     internal class Rfc2136DnsProvider
     {
+        private static readonly ILogger _logger = LogHandler.GetClassLogger<Rfc2136DnsProvider>();
+
         private readonly string _serverHost;
         private readonly int _serverPort;
         private readonly string _zoneName;
         private readonly string _tsigKeyName;
         private readonly byte[] _tsigKey;
         private readonly TSigAlgorithm _tsigAlgorithm;
-        private readonly ILogger _logger;
 
         public Rfc2136DnsProvider(
             string serverHost,
@@ -29,8 +31,7 @@ namespace Keyfactor.Extensions.DomainValidator.Rfc2136
             string tsigKeyName,
             string tsigKeyValue,
             string tsigAlgorithm = "hmac-sha256",
-            int serverPort = 53,
-            ILogger logger = null)
+            int serverPort = 53)
         {
             _serverHost = serverHost ?? throw new ArgumentNullException(nameof(serverHost));
             _zoneName = zoneName?.TrimEnd('.') ?? throw new ArgumentNullException(nameof(zoneName));
@@ -38,7 +39,6 @@ namespace Keyfactor.Extensions.DomainValidator.Rfc2136
             _tsigKey = Convert.FromBase64String(tsigKeyValue ?? throw new ArgumentNullException(nameof(tsigKeyValue)));
             _tsigAlgorithm = ParseTsigAlgorithm(tsigAlgorithm);
             _serverPort = serverPort;
-            _logger = logger;
         }
 
         public async Task<bool> CreateRecordAsync(string recordName, string txtValue)
@@ -46,7 +46,7 @@ namespace Keyfactor.Extensions.DomainValidator.Rfc2136
             try
             {
                 var cleanName = recordName.TrimEnd('.');
-                _logger?.LogDebug("[RFC2136] Creating TXT record: {RecordName} = {TxtValue}", cleanName, txtValue);
+                _logger.LogDebug("[RFC2136] Creating TXT record: {RecordName} = {TxtValue}", cleanName, txtValue);
 
                 await DeleteRecordAsync(recordName);
 
@@ -66,24 +66,31 @@ namespace Keyfactor.Extensions.DomainValidator.Rfc2136
                     null,
                     _tsigKey);
 
-                _logger?.LogDebug("[RFC2136] Sending update to {Server}:{Port}", serverAddress, _serverPort);
+                _logger.LogDebug("[RFC2136] Sending update to {Server}:{Port}", serverAddress, _serverPort);
                 var client = new ArDnsClient(serverAddress, _serverPort);
                 var response = await client.SendUpdateAsync(msg);
 
                 if (response == null)
                 {
-                    _logger?.LogError("[RFC2136] No response received from DNS server");
-                    throw new InvalidOperationException("RFC2136 DNS update failed: No response from server");
+                    _logger.LogError(
+                        "[RFC2136] No response received from DNS server {Server}:{Port} while creating TXT record '{RecordName}' in zone '{Zone}'. The server may be unreachable, refusing TCP/UDP 53, or dropping TSIG-signed updates.",
+                        _serverHost, _serverPort, cleanName, _zoneName);
+                    throw new InvalidOperationException(
+                        $"RFC2136 DNS update failed: no response from server {_serverHost}:{_serverPort} creating TXT record '{cleanName}' in zone '{_zoneName}'. Verify the server is reachable and accepts dynamic updates.");
                 }
 
                 if (response.ReturnCode == ReturnCode.NoError)
                 {
-                    _logger?.LogInformation("[RFC2136] Successfully created TXT record: {RecordName}", cleanName);
+                    _logger.LogInformation("[RFC2136] Successfully created TXT record: {RecordName}", cleanName);
                     return true;
                 }
 
-                _logger?.LogError("[RFC2136] Failed to create TXT record. Return code: {ReturnCode}", response.ReturnCode);
-                throw new InvalidOperationException($"RFC2136 DNS update failed with return code: {response.ReturnCode}");
+                _logger.LogError(
+                    "[RFC2136] Failed to create TXT record '{RecordName}' in zone '{Zone}' on {Server}:{Port}. Return code: {ReturnCode}.",
+                    cleanName, _zoneName, _serverHost, _serverPort, response.ReturnCode);
+                throw new InvalidOperationException(
+                    $"RFC2136 DNS update to create TXT record '{cleanName}' in zone '{_zoneName}' on {_serverHost}:{_serverPort} failed with return code '{response.ReturnCode}'. " +
+                    "A REFUSED/NOTAUTH code usually indicates a TSIG key/zone mismatch or the server not being authoritative for the zone.");
             }
             catch (InvalidOperationException)
             {
@@ -91,8 +98,9 @@ namespace Keyfactor.Extensions.DomainValidator.Rfc2136
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "[RFC2136] Error creating TXT record for {RecordName}", recordName);
-                throw new InvalidOperationException($"RFC2136 DNS provider error: {ex.Message}", ex);
+                _logger.LogError(ex, "[RFC2136] Error creating TXT record for {RecordName} in zone '{Zone}' on {Server}:{Port}", recordName, _zoneName, _serverHost, _serverPort);
+                throw new InvalidOperationException(
+                    $"RFC2136 DNS provider error creating TXT record '{recordName}' in zone '{_zoneName}' on {_serverHost}:{_serverPort}: {ex.Message}", ex);
             }
         }
 
@@ -101,7 +109,7 @@ namespace Keyfactor.Extensions.DomainValidator.Rfc2136
             try
             {
                 var cleanName = recordName.TrimEnd('.');
-                _logger?.LogDebug("[RFC2136] Deleting TXT record: {RecordName}", cleanName);
+                _logger.LogDebug("[RFC2136] Deleting TXT record: {RecordName}", cleanName);
 
                 var serverAddress = await ResolveServerAddressAsync();
                 var msg = new DnsUpdateMessage { ZoneName = DomainName.Parse(_zoneName) };
@@ -122,19 +130,33 @@ namespace Keyfactor.Extensions.DomainValidator.Rfc2136
                 var client = new ArDnsClient(serverAddress, _serverPort);
                 var response = await client.SendUpdateAsync(msg);
 
+                // No response, NOERROR, or NXDOMAIN all mean there is nothing left to
+                // clean up (or the delete succeeded) — treat as an idempotent success.
                 if (response == null || response.ReturnCode == ReturnCode.NoError || response.ReturnCode == ReturnCode.NxDomain)
                 {
-                    _logger?.LogInformation("[RFC2136] Successfully deleted TXT record: {RecordName}", cleanName);
+                    _logger.LogInformation("[RFC2136] Successfully deleted TXT record: {RecordName}", cleanName);
                     return true;
                 }
 
-                _logger?.LogWarning("[RFC2136] Delete returned code: {ReturnCode}", response.ReturnCode);
-                return false;
+                // Any other rcode (REFUSED, NOTAUTH, SERVFAIL, ...) is a real failure that
+                // previously returned false and was silently swallowed by the AnyGateway
+                // service. Surface it in both the log and the enrollment error.
+                _logger.LogError(
+                    "[RFC2136] Failed to delete TXT record '{RecordName}' in zone '{Zone}' on {Server}:{Port}. Return code: {ReturnCode}.",
+                    cleanName, _zoneName, _serverHost, _serverPort, response.ReturnCode);
+                throw new InvalidOperationException(
+                    $"RFC2136 DNS update to delete TXT record '{cleanName}' in zone '{_zoneName}' on {_serverHost}:{_serverPort} failed with return code '{response.ReturnCode}'. " +
+                    "A REFUSED/NOTAUTH code usually indicates a TSIG key/zone mismatch or the server not being authoritative for the zone.");
+            }
+            catch (InvalidOperationException)
+            {
+                throw;
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "[RFC2136] Error deleting TXT record for {RecordName}", recordName);
-                return false;
+                _logger.LogError(ex, "[RFC2136] Error deleting TXT record for {RecordName} in zone '{Zone}' on {Server}:{Port}", recordName, _zoneName, _serverHost, _serverPort);
+                throw new InvalidOperationException(
+                    $"RFC2136 DNS provider error deleting TXT record '{recordName}' in zone '{_zoneName}' on {_serverHost}:{_serverPort}: {ex.Message}", ex);
             }
         }
 
@@ -148,7 +170,11 @@ namespace Keyfactor.Extensions.DomainValidator.Rfc2136
             var addresses = await Dns.GetHostAddressesAsync(_serverHost);
             if (addresses.Length == 0)
             {
-                throw new InvalidOperationException($"Could not resolve DNS server: {_serverHost}");
+                _logger.LogError(
+                    "[RFC2136] Could not resolve DNS server host '{Server}'. Verify the Rfc2136_Server value is a reachable hostname or IP address.",
+                    _serverHost);
+                throw new InvalidOperationException(
+                    $"Could not resolve RFC2136 DNS server host '{_serverHost}'. Verify the Rfc2136_Server value is a reachable hostname or IP address.");
             }
 
             return addresses.FirstOrDefault(a => a.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
