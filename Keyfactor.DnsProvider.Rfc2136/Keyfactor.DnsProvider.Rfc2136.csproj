@@ -5,6 +5,7 @@
     <Nullable>disable</Nullable>
     <RootNamespace>Keyfactor.Extensions.DomainValidator.Rfc2136</RootNamespace>
     <AssemblyName>Rfc2136DomainValidator</AssemblyName>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
